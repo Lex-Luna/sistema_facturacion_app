@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse_lazy
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Categoria, SubCategoria, Marca
 from .forms import CategoriaForm, SubCategoriaForm, MarcaForm
-from django.contrib.auth.decorators import login_required, permission_required
+# from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
  
 class CategoriaView(LoginRequiredMixin, generic.ListView):
@@ -115,8 +115,8 @@ class MarcaEdit(LoginRequiredMixin, generic.UpdateView):
           form.instance.um = self.request.user.id
           return super().form_valid(form)
 
-@login_required(login_url='/login/')
-@permission_required('inv.change_marca', login_url='bases:sin_privilegios')
+# @login_required(login_url='/login/')
+# @permission_required('inv.change_marca', login_url='bases:sin_privilegios')
 def marca_inactivar(request, id):
     marca = Marca.objects.filter(pk=id).first()
     contexto={}
@@ -132,7 +132,7 @@ def marca_inactivar(request, id):
     if request.method=='POST':
         marca.estado=False
         marca.save()
-        messages.success(request, 'Marca Inactivada')
+     #    messages.success(request, 'Marca Inactivada')
         return redirect("inv:marca_list")
-
+        
     return render(request,template_name,contexto)
