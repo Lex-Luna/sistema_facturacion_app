@@ -1,3 +1,59 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
+from django.views import generic
 
-# Create your views here.
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required, permission_required
+from django.http import HttpResponse
+from datetime import datetime
+from django.contrib import messages
+
+from django.contrib.auth import authenticate
+
+from bases.views import SinPrivilegios
+
+from .models import Cliente#, FacturaEnc, FacturaDet
+from .forms import ClienteForm
+import inv.views as inv
+from inv.models import Producto
+
+class ClienteView(SinPrivilegios, generic.ListView):
+    model = Cliente
+    template_name = "fac/cliente_list.html"
+    context_object_name = "obj"
+    permission_required="fac.view_cliente"
+
+
+class VistaBaseCreate(SuccessMessageMixin,SinPrivilegios, \
+    generic.CreateView):
+    context_object_name = 'obj'
+    success_message="Registro Agregado Satisfactoriamente"
+
+    def form_valid(self, form):
+        form.instance.uc = self.request.user
+        return super().form_valid(form)
+
+class VistaBaseEdit(SuccessMessageMixin,SinPrivilegios, \
+    generic.UpdateView):
+    context_object_name = 'obj'
+    success_message="Registro Actualizado Satisfactoriamente"
+
+    def form_valid(self, form):
+        form.instance.um = self.request.user.id
+        return super().form_valid(form)
+
+
+class ClienteNew(VistaBaseCreate):
+    model=Cliente
+    template_name="fac/cliente_form.html"
+    form_class=ClienteForm
+    success_url= reverse_lazy("fac:cliente_list")
+    permission_required="fac.add_cliente"
+
+
+class ClienteEdit(VistaBaseEdit):
+    model=Cliente
+    template_name="fac/cliente_form.html"
+    form_class=ClienteForm
+    success_url= reverse_lazy("fac:cliente_list")
+    permission_required="fac.change_cliente"
