@@ -16,7 +16,7 @@ from bases.views import SinPrivilegios
 from inv.models import Producto
 
 
-class ProveedorView(SinPrivilegios, generic.ListView):
+class ProveedorView(SinPrivilegios, generic.ListView): 
     model = Proveedor
     template_name = "cmp/proveedor_list.html"
     context_object_name = "obj"
